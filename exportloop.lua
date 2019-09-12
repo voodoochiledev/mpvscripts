@@ -2,7 +2,6 @@
 -- For now only mp4 is supported, but gif may be implemented later
 
 local mp = require "mp"
-local msg = require "mp.msg"
 local utils = require "mp.utils"
 
 local defaults = {
@@ -60,19 +59,17 @@ local function export_loop(burnsubs)
 	local filename    = mp.get_property("filename")
 	local outfilename = getOutputName(filename)
 
-	-- If we are burning subtitles, it is necessary to require -ss after -i.
+	-- If we are burning subtitles, it is necessary to place -ss after -i.
 	-- This is a big hit to efficiency, as it forces ffmpeg to read the file from the beginning, so we do not do this by default
 	local ffmpegArgs  = {}
 	if burnsubs then
 		ffmpegArgs = {
-			'run', 'cmd.exe', '/d', '/c',
-			'ffmpeg', '-i', filename, '-ss', starttime, '-t', duration, "-c:v", defaults.videoEnc, "-c:a", defaults.audioEnc,
+			'run', 'ffmpeg', '-i', filename, '-ss', starttime, '-t', duration, "-c:v", defaults.videoEnc, "-c:a", defaults.audioEnc,
 			"-filter_complex", "subtitles=\'" .. filename .. "\'"
 		}
 	else
 		ffmpegArgs = {
-			'run', 'cmd.exe', '/d', '/c',
-			'ffmpeg', '-ss', starttime, '-i', filename, '-t', duration, "-c:v", defaults.videoEnc, "-c:a", defaults.audioEnc
+			'run', 'ffmpeg', '-ss', starttime, '-i', filename, '-t', duration, "-c:v", defaults.videoEnc, "-c:a", defaults.audioEnc
 		}
 	end
 	for k,v in pairs(defaults.otherFlags) do
